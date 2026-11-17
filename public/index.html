@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bridge · Model Compare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="theme-beige">
+  <!-- ── HEADER ─────────────────────────────────────────────────────────────── -->
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Bridge <em>Model Compare</em></span>
+      </div>
+      <div class="header-controls">
+        <span class="powered-by">powered by <a href="https://bridge.wekoya.tech" target="_blank" rel="noopener">Wekoya Bridge</a></span>
+        <label class="theme-toggle" title="Toggle dark mode">
+          <input type="checkbox" id="themeToggle" />
+          <span class="toggle-track">
+            <span class="toggle-thumb"></span>
+          </span>
+          <span class="toggle-label">Dark</span>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── MAIN ──────────────────────────────────────────────────────────────── -->
+  <main>
+    <!-- Prompt + controls -->
+    <section class="controls-panel">
+      <div class="prompt-wrap">
+        <label for="promptInput" class="sr-only">Your prompt</label>
+        <textarea
+          id="promptInput"
+          placeholder="Enter a prompt to compare across models…"
+          rows="3"
+          spellcheck="true"
+        ></textarea>
+        <span class="char-count" id="charCount">0</span>
+      </div>
+
+      <div class="model-selector-section">
+        <div class="model-selector-header">
+          <span class="selector-label">Select up to 4 models</span>
+          <div class="selector-actions">
+            <button class="btn-ghost" id="clearModels">Clear</button>
+            <button class="btn-ghost" id="randomModels">Random</button>
+          </div>
+        </div>
+
+        <!-- Search + filter -->
+        <div class="model-search-row">
+          <div class="search-wrap">
+            <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="modelSearch" placeholder="Search models…" autocomplete="off" />
+          </div>
+          <div class="provider-filters" id="providerFilters"></div>
+        </div>
+
+        <div class="model-grid" id="modelGrid">
+          <div class="loading-models">
+            <span class="spinner"></span> Loading models…
+          </div>
+        </div>
+
+        <div class="selected-badges" id="selectedBadges"></div>
+      </div>
+
+      <div class="run-row">
+        <button class="btn-run" id="runBtn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Compare
+        </button>
+        <span class="run-hint" id="runHint">Select at least 1 model to run</span>
+      </div>
+    </section>
+
+    <!-- Results grid -->
+    <section class="results-section" id="resultsSection" hidden>
+      <div class="results-header">
+        <h2 class="results-title">Results</h2>
+        <button class="btn-ghost" id="clearResults">Clear</button>
+      </div>
+      <div class="results-grid" id="resultsGrid"></div>
+    </section>
+  </main>
+
+  <!-- ── DETAIL MODAL ───────────────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="modalOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h3 id="modalTitle">Detailed Metrics</h3>
+        <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
