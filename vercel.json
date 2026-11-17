@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/api/models", "destination": "/api/models" },
+    { "source": "/api/compare", "destination": "/api/compare" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

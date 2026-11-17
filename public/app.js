@@ -2,6 +2,27 @@
    Bridge Model Compare · app.js
    ══════════════════════════════════════════════════════════════════════════ */
 
+// ── Markdown renderer (marked.js loaded via CDN) ──────────────────────────
+// Configure marked: sanitize links, don't mangle emails, use GFM + breaks
+function setupMarked() {
+  if (typeof marked === "undefined") return;
+  marked.setOptions({
+    gfm: true,
+    breaks: true,     // single newlines become <br>
+    pedantic: false,
+  });
+}
+setupMarked();
+
+function renderMarkdown(text) {
+  if (typeof marked === "undefined") return escHtml(text); // fallback
+  try {
+    return marked.parse(text);
+  } catch {
+    return escHtml(text);
+  }
+}
+
 // ── State ─────────────────────────────────────────────────────────────────
 let allModels = [];        // full catalogue from /api/models
 let selectedModels = [];   // array of model ids (max 4)
@@ -326,9 +347,9 @@ function renderResults(results) {
         </div>
       </div>
 
-      <div class="result-body ${r.ok ? "" : "error"}">
+      <div class="result-body ${r.ok ? "markdown-body" : "error"}">
         ${r.ok
-          ? escHtml(r.content)
+          ? renderMarkdown(r.content)
           : `<svg class="error-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${escHtml(r.error || "Unknown error")}`
         }
       </div>
