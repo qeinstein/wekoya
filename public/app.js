@@ -2,25 +2,68 @@
    Bridge Model Compare · app.js
    ══════════════════════════════════════════════════════════════════════════ */
 
-// ── Markdown renderer (marked.js loaded via CDN) ──────────────────────────
-// Configure marked: sanitize links, don't mangle emails, use GFM + breaks
+// ── Markdown + LaTeX renderer ─────────────────────────────────────────────
+// marked.js escapes backslashes, which breaks LaTeX (e.g. \alpha → \\alpha).
+// Strategy: extract all math regions FIRST, replace with unique placeholders,
+// let marked do its markdown thing, then swap placeholders for KaTeX output.
+
 function setupMarked() {
   if (typeof marked === "undefined") return;
-  marked.setOptions({
-    gfm: true,
-    breaks: true,     // single newlines become <br>
-    pedantic: false,
-  });
+  marked.setOptions({ gfm: true, breaks: true, pedantic: false });
 }
 setupMarked();
 
 function renderMarkdown(text) {
-  if (typeof marked === "undefined") return escHtml(text); // fallback
+  if (typeof marked === "undefined") return escHtml(text);
+
+  const slots = [];
+
+  // Helper: stash a math expression and return its placeholder token
+  const stash = (math, display) => {
+    const token = `\x02MATH${slots.length}\x03`;  // non-printable delimiters, safe from marked
+    slots.push({ math, display });
+    return token;
+  };
+
+  // 1. Pull out display math  $$...$$  (must come before inline to avoid double-match)
+  let src = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, m) => stash(m, true));
+
+  // 2. Pull out inline math  $...$  — avoid matching empty or cross-line pairs
+  src = src.replace(/\$([^\n$\\]*(?:\\.[^\n$\\]*)*)\$/g, (_, m) => stash(m, false));
+
+  // 3. Run marked on the math-free source
+  let html;
   try {
-    return marked.parse(text);
+    html = marked.parse(src);
   } catch {
-    return escHtml(text);
+    html = escHtml(src);
   }
+
+  // 4. Replace placeholders with KaTeX output
+  slots.forEach(({ math, display }, i) => {
+    const token = `\x02MATH${i}\x03`;
+    let rendered;
+    if (typeof katex !== "undefined") {
+      try {
+        rendered = katex.renderToString(math.trim(), {
+          displayMode: display,
+          throwOnError: false,
+          strict: false,
+        });
+        if (display) rendered = `<div class="math-display">${rendered}</div>`;
+      } catch {
+        rendered = escHtml(display ? `$$${math}$$` : `$${math}$`);
+      }
+    } else {
+      // KaTeX not loaded yet — render as code so it's at least readable
+      rendered = display
+        ? `<pre class="math-fallback">$$${escHtml(math)}$$</pre>`
+        : `<code class="math-fallback">$${escHtml(math)}$</code>`;
+    }
+    html = html.split(token).join(rendered);
+  });
+
+  return html;
 }
 
 // ── State ─────────────────────────────────────────────────────────────────

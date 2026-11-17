@@ -795,6 +795,36 @@ main {
   .powered-by { display: none; }
 }
 
+/* ── KaTeX math rendering ────────────────────────────────────────────────── */
+.math-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 0.8em 0;
+  padding: 4px 0;
+  text-align: center;
+}
+.math-display::-webkit-scrollbar { height: 4px; }
+.math-display::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+/* Inline KaTeX sits on the text baseline */
+.markdown-body .katex { font-size: 1em; }
+/* Display KaTeX gets a little more breathing room */
+.markdown-body .math-display .katex-display { margin: 0; }
+
+/* Fallback when KaTeX hasn't loaded */
+.math-fallback {
+  font-family: var(--mono);
+  font-size: 0.82em;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0.6em 0;
+}
+
 /* ── Markdown body rendering ─────────────────────────────────────────────── */
 /* Applied to .result-body.markdown-body — styles the HTML marked.js outputs  */
 
